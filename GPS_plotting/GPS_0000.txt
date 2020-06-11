@@ -1,0 +1,8 @@
+File Created
+$GPRMC,,V,,,,,,,,,,N*53
+$GPRMC,,V,,,,,,,,,,N*53
+$GPRMC,,V,,,,,,,,,,N*53
+$GPRMC,,V,,,,,,,,,,N*53
+$GPRMC,,V,,,,,,,,,,N*53
+$GPRMC,,V,,,,,,,,,,N*53
+$GPRMC,,V,
