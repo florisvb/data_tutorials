@@ -92,13 +92,17 @@ for example:
 	
 5. Open a notebook. Click <code>File>New Notebook..."</code>. Choose the one that matches your virtual environment name.
 
-6. Make sure that things are working properly. 
+6. Make sure you're running the right version of python:
+        a. <code>import sys</code>
+        b. <code>print(sys.version)</code>
+
+7. Make sure that things are working properly. 
 	a. <code>import numpy</code> should work
-	b. <code>import matplotlib</code> should not work
+	b. <code>import matplotlib</code> should not work - we'll fix that in the next section
 	
 # Install some packages that we will commonly use
 1. With the virtual environment active, in the terminal, run:
-<code>python3.8 -m pip install scipy pandas tables matplotlib</code>
+<code>python3.8 -m pip install scipy pandas tables matplotlib h5py</code>
 2. Go back to your jupyter notebook. Go to <code>Kernel<Restart</code>. 
 3. <code>import matplotlib</code> should work now
 
