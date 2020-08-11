@@ -52,27 +52,27 @@ def load_data_from_directory(data_directory, data_type, number_fill_bytes):
         if df is None:
             df = pandas.DataFrame(data_buff)
         else:
-            df = pandas.concat([df, data_buff], ignore_index=True)
+            df = pandas.concat([df, pandas.DataFrame(data_buff)], ignore_index=True)
 
     return df
 
 if __name__ == '__main__':
 
-# where your binary data files are
-data_directory = 'sample_data'
+    # where your binary data files are
+    data_directory = 'sample_data'
 
-# data column names and corresponding types based on the struct_t in the teensy firmware
-# see: https://numpy.org/devdocs/user/basics.types.html
-data_type = [('time', '<u4'),  # uint32_t time;
-             ('test1', '<u4'), # uint32_t test1;
-             ('test2', 'S24')] # char test2[24];
+    # data column names and corresponding types based on the struct_t in the teensy firmware
+    # see: https://numpy.org/devdocs/user/basics.types.html
+    data_type = [('time', '<u4'),  # uint32_t time;
+                 ('test1', '<u4'), # uint32_t test1;
+                 ('test2', 'S24')] # char test2[24];
 
-# how many fill bytes are there? from teensy code.
-# would be nice if this could be determined automatically...
-# probably can be done given size of the file, size of the header, size of the buffer from the datatype
-number_fill_bytes = 28
+    # how many fill bytes are there? from teensy code.
+    # would be nice if this could be determined automatically...
+    # probably can be done given size of the file, size of the header, size of the buffer from the datatype
+    number_fill_bytes = 28
 
-dataframe = load_data_from_directory(data_directory, data_type, number_fill_bytes)
+    dataframe = load_data_from_directory(data_directory, data_type, number_fill_bytes)
 
 
 
