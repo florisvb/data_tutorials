@@ -36,7 +36,7 @@ def load_buffers_from_file(filename, data_type, number_fill_bytes, number_data_r
     return np.hstack( data['buff'] )
 
 def get_number_data_records(filename, data_type):
-    dt = np.dtype([('head', '<u4'), ('buff', data_type, (5,)), ('tail', 'i1', 1)])
+    dt = np.dtype([('head', '<u4'), ('buff', data_type, (5,)), ('tail', 'i1', 2)])
     data = np.fromfile(filename, dtype=dt)
     correct_number_data_records = data['head'][0] # the correct number
     return correct_number_data_records
