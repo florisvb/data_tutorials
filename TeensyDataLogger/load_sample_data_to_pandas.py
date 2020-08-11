@@ -35,17 +35,44 @@ def load_buffers_from_file(filename, data_type, number_fill_bytes, number_data_r
 
     return np.hstack( data['buff'] )
 
-def get_number_data_records(filename, data_type):
-    dt = np.dtype([('head', '<u4'), ('buff', data_type, (5,)), ('tail', 'i1', 2)])
+def discover_number_of_fill_bytes_and_data_records(filename, data_type, 
+                                                   number_data_records=5, number_fill_bytes=90,
+                                                   verbose = False):
+    '''
+    filename: of binary file
+    data_type: like this:
+    
+        data_type = [('millis', '<u4'),  # uint32_t time;
+             ('lat', np.single), # uint32_t test1;
+             ('lon', np.single),
+             ('gps_time', '<u4'),
+             ('gps_date', '<u4'),
+             ('wind', 'S128')] # char test2[24];
+             
+    number_data_records: guess of how many records per buffer
+    number_fill_bytes: MINIMUM guess of how many fill_bytes (try what the teensy says minus 4 or more)
+    
+    '''
+    
+    dt = np.dtype([('head', '<u4'), ('buff', data_type, (number_data_records,)), ('tail', 'i1', number_fill_bytes)])
+
+    # read the data
     data = np.fromfile(filename, dtype=dt)
-    correct_number_data_records = data['head'][0] # the correct number
-    return correct_number_data_records
+    number_data_records = data['head'][0] # the correct number
+    
+    while np.std(data['head']) > 0:
+        number_fill_bytes += 1
+        
+        dt = np.dtype([('head', '<u4'), ('buff', data_type, (number_data_records,)), ('tail', 'i1', number_fill_bytes)])
+        data = np.fromfile(filename, dtype=dt)
+        
+        if verbose:
+            print (number_fill_bytes, np.std(data['head']) )
+            
+    return number_data_records, number_fill_bytes
 
-def load_data_from_directory(data_directory, data_type, number_fill_bytes): 
+def load_data_from_directory(data_directory, data_type, number_data_records, number_fill_bytes): 
     filenames = get_filenames(data_directory, '.bin')
-
-    number_data_records = get_number_data_records(filenames[0], data_type)
-
     df = None
     for filename in filenames:
         data_buff = load_buffers_from_file(filename, data_type, number_fill_bytes, number_data_records)
@@ -67,13 +94,17 @@ if __name__ == '__main__':
                  ('test1', '<u4'), # uint32_t test1;
                  ('test2', 'S24')] # char test2[24];
 
-    # how many fill bytes are there? from teensy code.
-    # would be nice if this could be determined automatically...
-    # probably can be done given size of the file, size of the header, size of the buffer from the datatype
-    number_fill_bytes = 28
+    filenames = get_filenames(data_directory, '.bin')
+    guess_number_data_records = 5
+    guess_min_number_fill_bytes = 2
+    number_data_records, number_fill_bytes = discover_number_of_fill_bytes_and_data_records(filenames[0], data_type, 
+                                                                                           number_data_records=guess_number_data_records, 
+                                                                                           number_fill_bytes=guess_min_number_fill_bytes,
+                                                                                           verbose = False)
+    print(number_data_records, number_fill_bytes)
 
-    dataframe = load_data_from_directory(data_directory, data_type, number_fill_bytes)
-
+    dataframe = load_data_from_directory(data_directory, data_type, number_data_records, number_fill_bytes)
+    print(dataframe)
 
 
 
