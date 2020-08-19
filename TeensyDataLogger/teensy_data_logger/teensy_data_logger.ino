@@ -30,13 +30,21 @@
  */
 
 #include "SdFat.h"
+#include <Chrono.h>
+
+Chrono SyncTimer;
+
+// if true, will print to serial monitor. disable if not using serial monitor
+bool print_serial = true;
+bool print_serial_data = false;
 
 // Pin with LED, which flashes whenever data is written to card, and does a 
 // slow blink when recording has stopped.
 const int LED_PIN = 13;
 
 // 512 byte buffer for testing (probably want this to be bigger in practice)
-const size_t BUF_DIM = 512;
+const size_t BUF_DIM = 512; // 16384;
+const uint32_t fileSizeWrite = 2048; // 262144;
 
 // Sampling rate
 const uint32_t sampleIntervalMillis = 10;
@@ -65,12 +73,11 @@ SdFatSdio sd;
 
 // File stuff
 File file;
-uint8_t dirname;
+uint32_t dirname;
 char dirname_char[8];
-uint8_t fname = 1;
+uint32_t fname = 1;
 char fname_char[8];
-char full_fname_char[16];
-unsigned long fileSizeWrite = 4096; //each file will be this big (in bytes)
+char full_fname_char[20];
 
 // Number of data records in a block.
 const uint16_t DATA_DIM = (BUF_DIM - 4)/sizeof(data_t);
@@ -109,8 +116,6 @@ bool collectingData = false;
 bool isSampling = false;
 bool justSampled = false;
 
-
-uint32_t test_millis = 0;
 String str = "this is a test string";
 
 //-----------------------------------------------------------------------------
@@ -130,27 +135,10 @@ void setup() {
   sd.begin();
   
   // every time teensy is rebooted, make a new directory
-  dirname = 1;
-  itoa(dirname, dirname_char, 10);
-  while (sd.exists(dirname_char)){
-    Serial.print("dirname exists: ");
-    Serial.println(dirname_char);
-    dirname ++;
-    itoa(dirname, dirname_char, 10);
-  }
-  sd.mkdir(dirname_char);
-  Serial.print("made directory: ");
-  Serial.println(dirname_char);
+  getDirName();
 
   // get a new filename
-  getFullFname();
-  if (!file.open(full_fname_char, O_RDWR | O_CREAT)) {
-    error("open failed");
-  }
-  else {
-    Serial.print("Opened file for writing: ");
-    Serial.println(full_fname_char);
-  }
+  openNewFile();
   
   Serial.print("Block size: ");
   Serial.println(BUF_DIM);
@@ -162,7 +150,8 @@ void setup() {
   Serial.println(DATA_DIM*sizeof(data_t));
   Serial.print("Fill bytes per block: ");
   Serial.println(FILL_DIM);
-  Serial.println("Recording. Enter any key to stop.");
+  Serial.println("Recording.");
+  
   delay(100);
   collectingData=true;
   nextSampleMillis = millis() + sampleIntervalMillis;
@@ -170,31 +159,34 @@ void setup() {
 //-----------------------------------------------------------------------------
 void loop() {
   
-  if (file.size() > fileSizeWrite){
+  if (SyncTimer.hasPassed(20000)){
+    SyncTimer.restart();
+    file.sync(); 
+
+    if (print_serial) {
+      Serial.print("File sync.");
+    }
+  }
+
+  if (file.size()>=fileSizeWrite) {
     fileIsClosing = true;
+  }
+
+  if (fileIsClosing) {
+    file.close();
+
+    if (print_serial) {
+      Serial.print("File complete.");
+    }
+    
+    // open new file
+    fileIsClosing = false;
+    openNewFile();
   }
   
   // Write the block at the tail of the full queue to the SD card
   if (fullHead == fullTail) { // full queue is empty
-    if (fileIsClosing){
-      file.close();
-      Serial.println("File complete.");
-
-      // open new file
-      fileIsClosing = false;
-      getFullFname();
-      if (!file.open(full_fname_char, O_RDWR | O_CREAT)) {
-        error("open failed");
-      }
-      else {
-        Serial.print("Opened file for writing: ");
-        Serial.println(full_fname_char);
-      }
-      
-    } else {
       yield(); // acquire data etc.
-    }
-    
   } else { // full queue not empty
     // write buffer at the tail of the full queue and return it to the top of
     // the empty stack.
@@ -207,6 +199,8 @@ void loop() {
     emptyStack[emptyTop++] = pBlock;
     digitalWrite(LED_PIN, LOW);
   }
+
+  fileIsClosing = Serial.available();
 
 }
 //-----------------------------------------------------------------------------
@@ -282,7 +276,7 @@ void putCurrentBlock() {
 void error(String msg) {
   Serial.print("ERROR: ");
   Serial.println(msg);
-  blinkForever();
+  // blinkForever();
 }
 //-----------------------------------------------------------------------------
 void acquireData(data_t* data){
@@ -293,10 +287,12 @@ void acquireData(data_t* data){
   str.toCharArray(data->test2, 24);
   data->test1 = 15;
 
-  Serial.print(data->time);
-  Serial.print(":  ");
-  //Serial.println(data->wind);
-  Serial.println(data->test2);
+  if (print_serial_data) {
+    Serial.print(data->time);
+    Serial.print(":  ");
+    Serial.println(data->test2);
+  }
+  
 }
 //-----------------------------------------------------------------------------
 void blinkForever() {
@@ -310,19 +306,61 @@ void blinkForever() {
 
 void getFullFname() {
   // every time teensy is rebooted, make a new directory
-  itoa(fname, fname_char, 10);
+  sprintf(fname_char, "%07lu", fname);
   strcpy(full_fname_char, dirname_char);
   strcat(full_fname_char, "/");
   strcat(full_fname_char, fname_char);
   strcat(full_fname_char, ".bin");
+
   while (sd.exists(full_fname_char)){
-    Serial.print("fname exists: ");
-    Serial.println(full_fname_char);
+
+    if (print_serial) {
+      Serial.print("fname exists: ");
+      Serial.println(full_fname_char);
+    }
+    
     fname ++;
-    itoa(fname, fname_char, 10);
+    Serial.print("trying fname number: ");
+    Serial.println(fname);
+    sprintf(fname_char, "%07lu", fname);
     strcpy(full_fname_char, dirname_char);
     strcat(full_fname_char, "/");
     strcat(full_fname_char, fname_char);
     strcat(full_fname_char, ".bin");
+  }
+}
+
+void openNewFile() {
+  getFullFname();
+  if (print_serial) {
+      Serial.print("Opening file for writing: ");
+      Serial.println(full_fname_char);
+  }
+  if (!file.open(full_fname_char, O_RDWR | O_CREAT)) {
+    error("open failed");
+  }
+  else {
+    if (print_serial) {
+      Serial.print("Opened file for writing: ");
+      Serial.println(full_fname_char);
+    }
+  }
+}
+
+void getDirName() {
+  dirname = 1;
+  sprintf(dirname_char, "%07lu", dirname);
+  while (sd.exists(dirname_char)){
+    if (print_serial) {
+      Serial.print("dirname exists: ");
+      Serial.println(dirname_char);
+    }
+    dirname ++;
+    sprintf(dirname_char, "%07lu", dirname);
+  }
+  sd.mkdir(dirname_char);
+  if (print_serial) {
+    Serial.print("made directory: ");
+    Serial.println(dirname_char);
   }
 }
