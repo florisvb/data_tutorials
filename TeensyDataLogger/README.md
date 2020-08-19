@@ -7,3 +7,6 @@ If you run that code it will generate a directory with N binary data files. An e
 
 
 To load the binary data into python requires jumping through some hoops. The python file `load_sample_data_to_pandas.py` provides an example of how this is done. Note that you will need to change the analysis code depending on the data type and buffer size of the data!
+
+
+A complete functioning example using the teensy to read Serial data can be found here: https://github.com/florisvb/gps_wind_station
