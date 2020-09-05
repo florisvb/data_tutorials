@@ -44,7 +44,7 @@ Assumptions:
 	* Then download a python script with the following command:
 	<code>curl https://bootstrap.pypa.io/get-pip.py | python</code>
 	* And run it:
-	<code>python get-pip.py</code>
+	<code>python ~/get-pip.py</code>
 	* Make sure you're up to date:
 	<code>python3.8 -m pip install --upgrade pip</code>
 
