@@ -118,10 +118,10 @@ For example: https://realpython.com/jupyter-notebook-introduction/
     * Find the responsible process
     <code>ps aux | grep https://localhost:10002/</code>
     That should show something like:
-    <code>username 5181  0.0  0.0  14224  1012 pts/32 S+ 14:34 0:00 grep --color=auto **https://localhost:9999/**</code>
+      * <code>username 5181  0.0  0.0  14224  1012 pts/32 S+ 14:34 0:00 grep --color=auto **https://localhost:9999/**</code>
     * Take note of the process number, after the username, e.g. <code>5181</code>   
     * Kill it.
-    <code>sudo kill 5181</code>
+      * <code>sudo kill 5181</code>
 # Optional: running a remote jupyter notebook server
 
 If you wish to run your notebook on a remote computer, you can set up a password etc. Most of the lab desktops already have this set up, but for reference: [https://jupyter-notebook.readthedocs.io/en/stable/public_server.html](https://jupyter-notebook.readthedocs.io/en/stable/public_server.html)
