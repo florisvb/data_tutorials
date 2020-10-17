@@ -39,33 +39,33 @@ Assumptions:
 	<code>ctrl-d</code>
 
 6. Get pip working in your virtual environment. The problem with adding "--without-pip" is that pip is very convenient for installing python packages. So, we will have to install it into the virtual environment manually. All the following should be done with your virtual environment active.
-	a. You might need to run this: 
+	* You might need to run this: 
 	<code>sudo apt-get install python3.8-distutils</code>
-	b. Then download a python script with the following command:
+	* Then download a python script with the following command:
 	<code>curl https://bootstrap.pypa.io/get-pip.py | python</code>
-	c. And run it:
-	<code>python get-pip.py</code>
-	d. Make sure you're up to date:
+	* And run it:
+	<code>python ~/get-pip.py</code>
+	* Make sure you're up to date:
 	<code>python3.8 -m pip install --upgrade pip</code>
 
 7. Test out pip, and install numpy.
-	a. Check to see if numpy is installed in your virtual environment, it should *not* be. If it is, you might not have activated your virtual environment?
+	* Check to see if numpy is installed in your virtual environment, it should *not* be. If it is, you might not have activated your virtual environment?
 	<code>python</code> 
 	<code>>>> import numpy</code> should give an error (the >>> indicates this is in the python interpreter, you should not type this)
 	<code>ctrl-d</code> exit python interpreter
-	b. Install numpy. There are many different syntaxes for using pip to install packages. This is the most verbose, but most explicit. I recommend it.
+	* Install numpy. There are many different syntaxes for using pip to install packages. This is the most verbose, but most explicit. I recommend it.
 	<code>python3.8 -m pip install numpy</code>
-	c. Repeat step a, you should have numpy installed now. 
+	* Repeat step a, you should have numpy installed now. 
 
 8. Optional: Installing a specific version of a package. Perhaps you need to run code that uses an old version of numpy. This is the power of virtual environments, you can have multiple versions of the same package installed in different virtual environments. 
-   a. What version is installed?
+   * What version is installed?
    <code>python</code>
    <code>>>> import numpy</code>
    <code>>>> numpy.&#95;&#95;version__</code> mine shows 1.19
    <code>ctrl-d</code> exit python interpreter
-   b. Uninstall current version
+   * Uninstall current version
 	<code>python3.8 -m pip uninstall numpy</code>
-   c. Install a specific version:
+   * Install a specific version:
    <code>python3.8 -m pip install numpy==1.18</code>
 
 # Install Jupyter Notebook into your virtual environment
@@ -79,13 +79,13 @@ Assumptions:
 <code>jupyter notebook</code>
 
 4. A browser window should open with a file browser like view. If it doesn't, you can access it manually.
-a. Take note of this line:
+  * Take note of this line:
 <code>https://[all ip addresses on your system]:10003/</code> The last number is your notebook's port. But you will need to know your IP address. 
-b. Finding your IP. Open a terminal window, type:
+  * Finding your IP. Open a terminal window, type:
 <code>ifconfig</code>
 Look for something like this: <code>inet addr:134.197.27.23</code>
-c. Open firefox (it is the most robust).
-d. Go to:
+  * Open firefox (it is the most robust).
+  * Go to:
 <code>https://your_ip_address:your_port</code>
 for example:
 <code>https://134.197.27.23:10003</code>
@@ -93,12 +93,12 @@ for example:
 5. Open a notebook. Click <code>File>New Notebook..."</code>. Choose the one that matches your virtual environment name.
 
 6. Make sure you're running the right version of python:
-        a. <code>import sys</code>
-        b. <code>print(sys.version)</code>
+        * <code>import sys</code>
+        * <code>print(sys.version)</code>
 
 7. Make sure that things are working properly. 
-	a. <code>import numpy</code> should work
-	b. <code>import matplotlib</code> should not work - we'll fix that in the next section
+	* <code>import numpy</code> should work
+	* <code>import matplotlib</code> should not work - we'll fix that in the next section
 	
 # Install some packages that we will commonly use
 1. With the virtual environment active, in the terminal, run:
@@ -114,14 +114,14 @@ For example: https://realpython.com/jupyter-notebook-introduction/
 2. Can't remember what's running?
    <code>jupyter notebook list</code>
 3. Can't find the terminal responsible for a notebook session, and you want to kill it? 
-    a. Take note of the address:port from the list. e.g. <code>https://localhost:10002/</code>
-    b. Find the responsible process
+    * Take note of the address:port from the list. e.g. <code>https://localhost:10002/</code>
+    * Find the responsible process
     <code>ps aux | grep https://localhost:10002/</code>
     That should show something like:
-    <code>username 5181  0.0  0.0  14224  1012 pts/32 S+ 14:34 0:00 grep --color=auto **https://localhost:9999/**</code>
-    c. Take note of the process number, after the username, e.g. <code>5181</code>   
-    d. Kill it.
-    <code>sudo kill 5181</code>
+      * <code>username 5181  0.0  0.0  14224  1012 pts/32 S+ 14:34 0:00 grep --color=auto **https://localhost:9999/**</code>
+    * Take note of the process number, after the username, e.g. <code>5181</code>   
+    * Kill it.
+      * <code>sudo kill 5181</code>
 # Optional: running a remote jupyter notebook server
 
 If you wish to run your notebook on a remote computer, you can set up a password etc. Most of the lab desktops already have this set up, but for reference: [https://jupyter-notebook.readthedocs.io/en/stable/public_server.html](https://jupyter-notebook.readthedocs.io/en/stable/public_server.html)
