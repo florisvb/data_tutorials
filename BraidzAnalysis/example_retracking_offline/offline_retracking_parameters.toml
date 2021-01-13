@@ -1,0 +1,6 @@
+motion_noise_scale= 0.1
+initial_position_std_meters= 0.1
+initial_vel_std_meters_per_sec= 1.0
+ekf_observation_covariance_pixels= 6
+accept_observation_min_likelihood= 1e-8
+max_position_std_meters= 0.1
