@@ -1,0 +1,1 @@
+SUBSYSTEM=="tty", ATTRS{idVendor}=="2341", ATTRS{idProduct}=="0042", ATTRS{serial}=="5593034363635121D191", GROUP="plugdev", SYMLINK+="ledctrl", MODE:="0666"
