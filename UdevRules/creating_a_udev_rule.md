@@ -2,14 +2,14 @@
 
 1. With device unplugged, type `dmesg` in the terminal and note the last device that is shown
 2. Plug in the device, and type `dmesg` again. You should now see the information for your device, for example:
-
+```bash
 	[3447934.369359] usb 3-2: new full-speed USB device number 4 using xhci_hcd
 	[3447934.805911] usb 3-2: New USB device found, idVendor=2341, idProduct=0042, bcdDevice= 0.01
 	[3447934.805916] usb 3-2: New USB device strings: Mfr=1, Product=2, SerialNumber=220
 	[3447934.805919] usb 3-2: Manufacturer: Arduino (www.arduino.cc)
 	[3447934.805922] usb 3-2: SerialNumber: 5593034363635121D191
 	[3447934.816770] cdc_acm 3-2:1.0: ttyACM1: USB ACM device
-
+```
 Note: you can get much more info if you type `sudo lsusb -v`, but we don't need all that.
 
 3. Take note of the following key numbers: idVendor, idProduct, and SerialNumber.
