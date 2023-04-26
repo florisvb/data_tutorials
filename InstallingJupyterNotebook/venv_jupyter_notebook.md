@@ -66,7 +66,11 @@ Assumptions:
    * Uninstall current version
 	<code>python3.8 -m pip uninstall numpy</code>
    * Install a specific version:
-   <code>python3.8 -m pip install numpy==1.18</code>
+   <code>python3.8 -m pip install -r REQUIREMENTS.TXT</code>
+   
+# Installing a bunch of packages from a list of requirements
+If you have a list of requirements, like requirements.txt (for example: https://github.com/florisvb/PyNumDiff/blob/master/requirements.txt), you can install all of them at once using the command:
+<code>python3.8 -m pip install --upgrade pip</code>
 
 # Install Jupyter Notebook into your virtual environment
 1. Install jupyter notebook (with your virtual environment active):
